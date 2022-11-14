@@ -4,3 +4,4 @@
 **/datalog/**
 .erlang.cookie
 dump.rdb
+**/logs/**

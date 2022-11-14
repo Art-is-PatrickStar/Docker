@@ -11,6 +11,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - LANG=en_US.UTF-8
+    restart: always
 
   sentinel2:
     image: redis:7.0.5
@@ -23,6 +24,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - LANG=en_US.UTF-8
+    restart: always
 
   sentinel3:
     image: redis:7.0.5
@@ -35,6 +37,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - LANG=en_US.UTF-8
+    restart: always
 
 networks:
   default:
