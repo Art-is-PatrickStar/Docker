@@ -1,0 +1,88 @@
+version: "3.8"
+services:
+  rabbit_master:
+    image: rabbitmq:management
+    container_name: rabbit_master
+    restart: always
+    hostname: rabbit_master
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ./rabbit_master/data:/var/lib/rabbitmq
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - RABBITMQ_ERLANG_COOKIE=RABBITMQCOOKIE
+      - RABBITMQ_NODENAME=rabbit_master@rabbit_master
+    networks:
+      - rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rabbit_node1:
+    image: rabbitmq:management
+    container_name: rabbit_node1
+    restart: always
+    hostname: rabbit_node1
+    ports:
+      - 5673:5672
+      - 15673:15672
+    volumes:
+      - ./rabbit_node1/data:/var/lib/rabbitmq
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - RABBITMQ_ERLANG_COOKIE=RABBITMQCOOKIE
+      - RABBITMQ_NODENAME=rabbit_node1@rabbit_node1
+    networks:
+      - rabbitmq
+    depends_on:
+      rabbit_master:
+        condition: service_healthy
+    command: >
+      bash -c "
+        rabbitmq-server -detached &&
+        sleep 30 &&
+        rabbitmqctl stop_app &&
+        rabbitmqctl join_cluster rabbit_master@rabbit_master &&
+        rabbitmqctl start_app &&
+        tail -f /dev/null
+      "
+
+  rabbit_node2:
+    image: rabbitmq:management
+    container_name: rabbit_node2
+    restart: always
+    hostname: rabbit_node2
+    ports:
+      - 5674:5672
+      - 15674:15672
+    volumes:
+      - ./rabbit_node2/data:/var/lib/rabbitmq
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - RABBITMQ_ERLANG_COOKIE=RABBITMQCOOKIE
+      - RABBITMQ_NODENAME=rabbit_node2@rabbit_node2
+    networks:
+      - rabbitmq
+    depends_on:
+      rabbit_master:
+        condition: service_healthy
+    command: >
+      bash -c "
+        rabbitmq-server -detached &&
+        sleep 30 &&
+        rabbitmqctl stop_app &&
+        rabbitmqctl join_cluster rabbit_master@rabbit_master &&
+        rabbitmqctl start_app &&
+        tail -f /dev/null
+      "
+
+networks:
+  rabbitmq:
+    driver: bridge

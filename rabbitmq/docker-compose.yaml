@@ -1,23 +1,16 @@
 version: "3.8"
 services:
-  rabbit_master:
+  rabbitmq:
     image: rabbitmq:management
-    container_name: rabbit_master
+    container_name: rabbitmq
     restart: always
-    hostname: rabbit_master
+    hostname: rabbitmq
     ports:
       - 5672:5672
       - 15672:15672
     volumes:
-      - ./rabbit_master/data:/var/lib/rabbitmq
+      - ./data:/var/lib/rabbitmq
     environment:
       - TZ=Asia/Shanghai
       - LANG=en_US.UTF-8
       - RABBITMQ_ERLANG_COOKIE=RABBITMQCOOKIE
-      - RABBITMQ_NODENAME:rabbit_master
-    networks:
-      - rabbitmq
-networks:
-  rabbitmq:
-    driver: bridge
-
